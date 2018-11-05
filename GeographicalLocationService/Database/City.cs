@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GeographicalLocationService
+namespace GeographicalLocationService.Database
 {
     using System;
     using System.Collections.Generic;
