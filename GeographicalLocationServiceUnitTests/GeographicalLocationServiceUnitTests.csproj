@@ -112,6 +112,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CititesControllerTests.cs" />
+    <Compile Include="EmbeddedResourceUtilities.cs" />
+    <Compile Include="ExternalServices\Countries\CountriesTests.cs" />
+    <Compile Include="ExternalServices\Weather\CurrentWeatherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +124,8 @@
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ExternalServices\Countries\AllCountries.json" />
+    <EmbeddedResource Include="ExternalServices\Weather\CurrentWeather.json" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

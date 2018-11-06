@@ -1,13 +1,16 @@
 ﻿namespace GeographicalLocationService.ExternalServices.Countries
 {
-	using System.Collections.Generic;
+	using Newtonsoft.Json;
 
 	public class Country
 	{
-		public string Alpha2CountryCode { get; set; }
+		[JsonProperty("alpha2Code")]
+		public string Alpha2Code { get; set; }
 
-		public string Alpha3CountryCode { get; set; }
+		[JsonProperty("alpha3Code")]
+		public string Alpha3Code { get; set; }
 
-		public List<string> Currencies { get; set; }
+		[JsonProperty("currencies")]
+		public Currency[] Currencies { get; set; }
 	}
 }

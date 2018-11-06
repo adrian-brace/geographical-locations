@@ -5,6 +5,7 @@
 	using System.Net.Http;
 	using System.Threading;
 	using System.Threading.Tasks;
+	using Newtonsoft.Json;
 
 	public class HttpClientHelper : IHttpClientHelper
 	{
@@ -20,30 +21,32 @@
 		/// <summary>
 		/// Returns the response as json
 		/// </summary>
+		/// <typeparam name="RS">The type of the response.</typeparam>
 		/// <param name="baseRequestUri">The base request URI.</param>
 		/// <returns>
 		/// Response string
 		/// </returns>
-		public string GetResult(Uri baseRequestUri)
+		public RS GetResponse<RS>(Uri baseRequestUri)
 		{
 			var result = Task.Run(() => this.GetAsync(baseRequestUri, DefaultRequestTimeoutSeconds)).Result;
 			result.EnsureSuccessStatusCode();
-			return result.Content.ReadAsStringAsync().Result;
+			return JsonConvert.DeserializeObject<RS>(result.Content.ReadAsStringAsync().Result);
 		}
 
 		/// <summary>
 		/// Returns the response as json
 		/// </summary>
+		/// <typeparam name="RS">The type of the response.</typeparam>
 		/// <param name="baseRequestUri">The base request URI.</param>
 		/// <param name="timeoutSeconds">The timeout seconds.</param>
 		/// <returns>
 		/// Response string
 		/// </returns>
-		public string GetResult(Uri baseRequestUri, int timeoutSeconds)
+		public RS GetResponse<RS>(Uri baseRequestUri, int timeoutSeconds)
 		{
 			var result = Task.Run(() => this.GetAsync(baseRequestUri, timeoutSeconds)).Result;
 			result.EnsureSuccessStatusCode();
-			return result.Content.ReadAsStringAsync().Result;
+			return JsonConvert.DeserializeObject<RS>(result.Content.ReadAsStringAsync().Result);
 		}
 
 		/// <summary>

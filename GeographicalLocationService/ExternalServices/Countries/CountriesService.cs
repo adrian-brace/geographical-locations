@@ -33,39 +33,16 @@
 
 			return cachedCountries[countryCode];
 		}
-
-		internal static Country BuildCountry(dynamic countryJson)
-		{
-			string alpha2Code = countryJson["alpha2Code"];
-			string alpha3Code = countryJson["alpha3Code"];
-
-			var country = new Country()
-			{
-				Alpha2CountryCode = alpha2Code,
-				Alpha3CountryCode = alpha3Code
-			};
-
-			dynamic currencies = JArray.Parse(countryJson["currencies"]);
-
-			foreach (var currency in currencies)
-			{
-				country.Currencies.Add(currency.ToString());
-			}
-
-			return country;
-		}
-
+		
 		private Dictionary<string, Country> GetAllCountries()
 		{
-			var response = this._httpClientHelper.GetResult(new Uri(this._countriesServiceBaseUri));
-			dynamic allCountriesResponse = JArray.Parse(response);
-
+			var response = this._httpClientHelper.GetResponse<List<Country>>(new Uri(this._countriesServiceBaseUri));
+			
 			var allCountries = new Dictionary<string, Country>();
 			
-			foreach (var countryJson in allCountriesResponse)
+			foreach (var country in response)
 			{
-				Country country = BuildCountry(countryJson);
-				allCountries.Add(country.Alpha2CountryCode, country);
+				allCountries.Add(country.Alpha2Code, country);
 			}
 
 			return allCountries;

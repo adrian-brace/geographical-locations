@@ -4,8 +4,8 @@
 
 	public interface IHttpClientHelper
 	{
-		string GetResult(Uri baseRequestUri);
+		RS GetResponse<RS>(Uri baseRequestUri);
 
-		string GetResult(Uri baseRequestUri, int timeoutSeconds);
+		RS GetResponse<RS>(Uri baseRequestUri, int timeoutSeconds);
 	}
 }

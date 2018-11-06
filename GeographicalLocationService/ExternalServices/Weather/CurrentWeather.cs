@@ -1,17 +1,16 @@
 ﻿namespace GeographicalLocationService.ExternalServices.Weather
 {
+	using Newtonsoft.Json;
+
 	public class CurrentWeather
 	{
-		public string Summary { get; set; }
+		[JsonProperty("weather")]
+		public Weather[] Weather { get; set; }
 
-		public string Description { get; set; }
+		[JsonProperty("main")]
+		public Main Main { get; set; }
 
-		public decimal Temperature { get; set; }
-
-		public int Pressure { get; set; }
-
-		public int Humidity { get; set; }
-
-		public decimal WindSpeed { get; set; }
+		[JsonProperty("wind")]
+		public Wind Wind { get; set; }
 	}
 }

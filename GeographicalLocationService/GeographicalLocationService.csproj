@@ -189,8 +189,14 @@
     <Compile Include="Database\IGeographicalLocationsDatabase.cs" />
     <Compile Include="ExternalServices\Countries\CountriesService.cs" />
     <Compile Include="ExternalServices\Countries\Country.cs" />
-    <Compile Include="ExternalServices\Countries\ICountriesService.cs" />
+    <Compile Include="ExternalServices\Countries\Currency.cs" />
     <Compile Include="ExternalServices\Weather\CurrentWeather.cs" />
+    <Compile Include="ExternalServices\Weather\Main.cs" />
+    <Compile Include="ExternalServices\Weather\Weather.cs" />
+    <Compile Include="ExternalServices\Weather\Wind.cs" />
+    <Compile Include="Models\Country.cs" />
+    <Compile Include="ExternalServices\Countries\ICountriesService.cs" />
+    <Compile Include="Models\CurrentWeather.cs" />
     <Compile Include="ExternalServices\Weather\IWeatherService.cs" />
     <Compile Include="ExternalServices\Weather\WeatherService.cs" />
     <Compile Include="Global.asax.cs">

@@ -112,11 +112,14 @@
 
 			var testCountry = new Country()
 			{
-				Alpha2CountryCode = "GB",
-				Alpha3CountryCode = "GBR",
-				Currencies = new List<string>
+				Alpha2Code = "GB",
+				Alpha3Code = "GBR",
+				Currencies = new Currency[]
 				{
-					"GBP"
+					new Currency()
+					{
+						Code = "GBP"
+					}
 				}
 			};
 
@@ -125,12 +128,24 @@
 			var weatherServiceMocked = new Mock<IWeatherService>();
 			var testCurrentWeather = new CurrentWeather()
 			{
-				Description = "light intensity drizzle",
-				Summary = "Drizzle",
-				Humidity = 81,
-				Pressure = 1012,
-				Temperature = 280.32m,
-				WindSpeed = 4.1m
+				Main = new Main()
+				{
+					Humidity = 81,
+					Pressure = 1012,
+					Temp = 280.32D
+				},
+				Weather = new Weather[]
+				{
+					new Weather()
+					{
+						Description = "light intensity drizzle",
+						Main = "Drizzle"
+					}
+				},
+				Wind = new Wind()
+				{
+					Speed = 4.1D
+				}
 			};
 
 			weatherServiceMocked.Setup(w => w.Get(cardiffCity.Name, cardiffCity.CountryCode)).Returns(testCurrentWeather);
@@ -171,17 +186,17 @@
 			Assert.AreEqual(cardiffCity.EstablishedOn, actualResponse.EstablishedOn);
 			Assert.AreEqual(cardiffCity.EstimatedPopulation, actualResponse.EstimatedPopulation);
 
-			Assert.AreEqual(testCountry.Alpha2CountryCode, actualResponse.Country.Alpha2CountryCode);
-			Assert.AreEqual(testCountry.Alpha3CountryCode, actualResponse.Country.Alpha3CountryCode);
+			Assert.AreEqual(testCountry.Alpha2Code, actualResponse.Country.Alpha2CountryCode);
+			Assert.AreEqual(testCountry.Alpha3Code, actualResponse.Country.Alpha3CountryCode);
 			Assert.AreEqual(testCountry.Currencies.First(), actualResponse.Country.Currencies.First());
 
 			Assert.AreEqual(1, actualResponse.CurrentWeather.Count);
-			Assert.AreEqual(testCurrentWeather.Description, actualResponse.CurrentWeather.First().Description);
-			Assert.AreEqual(testCurrentWeather.Humidity, actualResponse.CurrentWeather.First().Humidity);
-			Assert.AreEqual(testCurrentWeather.Pressure, actualResponse.CurrentWeather.First().Pressure);
-			Assert.AreEqual(testCurrentWeather.Summary, actualResponse.CurrentWeather.First().Summary);
-			Assert.AreEqual(testCurrentWeather.Temperature, actualResponse.CurrentWeather.First().Temperature);
-			Assert.AreEqual(testCurrentWeather.WindSpeed, actualResponse.CurrentWeather.First().WindSpeed);
+			Assert.AreEqual(testCurrentWeather.Weather.First().Description, actualResponse.CurrentWeather.First().Description);
+			Assert.AreEqual(testCurrentWeather.Weather.First().Main, actualResponse.CurrentWeather.First().Summary);
+			Assert.AreEqual(testCurrentWeather.Main.Humidity, actualResponse.CurrentWeather.First().Humidity);
+			Assert.AreEqual(testCurrentWeather.Main.Pressure, actualResponse.CurrentWeather.First().Pressure);			
+			Assert.AreEqual(testCurrentWeather.Main.Temp, actualResponse.CurrentWeather.First().Temperature);
+			Assert.AreEqual(testCurrentWeather.Wind.Speed, actualResponse.CurrentWeather.First().WindSpeed);
 		}
 
 		[TestMethod]
