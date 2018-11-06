@@ -114,7 +114,10 @@
 			{
 				Alpha2CountryCode = "GB",
 				Alpha3CountryCode = "GBR",
-				CurrencyCode = "GBP"
+				Currencies = new List<string>
+				{
+					"GBP"
+				}
 			};
 
 			countriesServiceMocked.Setup(c => c.Get(cardiffCity.CountryCode)).Returns(testCountry);
@@ -130,10 +133,7 @@
 				WindSpeed = 4.1m
 			};
 
-			weatherServiceMocked.Setup(w => w.Get(cardiffCity.Name, cardiffCity.CountryCode)).Returns(new List<CurrentWeather>()
-			{
-				testCurrentWeather
-			});
+			weatherServiceMocked.Setup(w => w.Get(cardiffCity.Name, cardiffCity.CountryCode)).Returns(testCurrentWeather);
 
 			// Act
 			try
@@ -173,7 +173,7 @@
 
 			Assert.AreEqual(testCountry.Alpha2CountryCode, actualResponse.Country.Alpha2CountryCode);
 			Assert.AreEqual(testCountry.Alpha3CountryCode, actualResponse.Country.Alpha3CountryCode);
-			Assert.AreEqual(testCountry.CurrencyCode, actualResponse.Country.CurrencyCode);
+			Assert.AreEqual(testCountry.Currencies.First(), actualResponse.Country.Currencies.First());
 
 			Assert.AreEqual(1, actualResponse.CurrentWeather.Count);
 			Assert.AreEqual(testCurrentWeather.Description, actualResponse.CurrentWeather.First().Description);

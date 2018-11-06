@@ -8,6 +8,6 @@
 
 	public interface IWeatherService
 	{
-		List<CurrentWeather> Get(string cityName, string countryCode);
+		CurrentWeather Get(string cityName, string countryCode);
 	}
 }
