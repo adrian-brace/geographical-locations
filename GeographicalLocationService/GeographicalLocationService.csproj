@@ -100,6 +100,9 @@
     </Reference>
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Security" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -194,6 +197,11 @@
     <Compile Include="ExternalServices\Weather\Main.cs" />
     <Compile Include="ExternalServices\Weather\Weather.cs" />
     <Compile Include="ExternalServices\Weather\Wind.cs" />
+    <Compile Include="Filters\ModelValidationFilterAttribute.cs" />
+    <Compile Include="Filters\ValidationErrorResponse.cs" />
+    <Compile Include="Filters\WebApiExceptionFilterAttribute.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Mappers\SearchCityResponseMapper.cs" />
     <Compile Include="Models\Country.cs" />
     <Compile Include="ExternalServices\Countries\ICountriesService.cs" />
     <Compile Include="Models\CurrentWeather.cs" />
@@ -209,6 +217,7 @@
     <Compile Include="Models\SearchCityResponse.cs" />
     <Compile Include="Models\UpdateCityRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaskUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\CustomDictionary.xml">

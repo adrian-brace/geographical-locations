@@ -78,10 +78,10 @@
 		}
 
 		[TestMethod]
-		public void Get()
+		public void Search()
 		{
 			CitiesController controller = null;
-			MODELS.SearchCityResponse actualResponse = null;
+			List<MODELS.SearchCityResponse> actualResponse = null;
 
 			var cardiffCity = new City()
 			{
@@ -158,7 +158,7 @@
 					countriesServiceMocked.Object,
 					weatherServiceMocked.Object);
 
-				actualResponse = controller.Get(cardiffCity.Name);
+				actualResponse = controller.Search(cardiffCity.Name);
 			}
 			catch (Exception ex)
 			{
@@ -176,27 +176,29 @@
 			Mock.VerifyAll(geographicalLocationsDatabaseMocked, countriesServiceMocked, weatherServiceMocked);
 
 			Assert.IsNotNull(actualResponse);
-			Assert.IsNotNull(actualResponse.Country);
-			Assert.IsNotNull(actualResponse.CurrentWeather);
 
-			Assert.AreEqual(cardiffCity.Id, actualResponse.Id);
-			Assert.AreEqual(cardiffCity.Name, actualResponse.Name);
-			Assert.AreEqual(cardiffCity.SubRegion, actualResponse.SubRegion);
-			Assert.AreEqual(cardiffCity.TouristRating, actualResponse.TouristRating);
-			Assert.AreEqual(cardiffCity.EstablishedOn, actualResponse.EstablishedOn);
-			Assert.AreEqual(cardiffCity.EstimatedPopulation, actualResponse.EstimatedPopulation);
+			var firstSearchCityResponse = actualResponse.First();
 
-			Assert.AreEqual(testCountry.Alpha2Code, actualResponse.Country.Alpha2CountryCode);
-			Assert.AreEqual(testCountry.Alpha3Code, actualResponse.Country.Alpha3CountryCode);
-			Assert.AreEqual(testCountry.Currencies.First(), actualResponse.Country.Currencies.First());
+			Assert.IsNotNull(firstSearchCityResponse.Country);
+			Assert.IsNotNull(firstSearchCityResponse.CurrentWeather);
 
-			Assert.AreEqual(1, actualResponse.CurrentWeather.Count);
-			Assert.AreEqual(testCurrentWeather.Weather.First().Description, actualResponse.CurrentWeather.First().Description);
-			Assert.AreEqual(testCurrentWeather.Weather.First().Main, actualResponse.CurrentWeather.First().Summary);
-			Assert.AreEqual(testCurrentWeather.Main.Humidity, actualResponse.CurrentWeather.First().Humidity);
-			Assert.AreEqual(testCurrentWeather.Main.Pressure, actualResponse.CurrentWeather.First().Pressure);			
-			Assert.AreEqual(testCurrentWeather.Main.Temp, actualResponse.CurrentWeather.First().Temperature);
-			Assert.AreEqual(testCurrentWeather.Wind.Speed, actualResponse.CurrentWeather.First().WindSpeed);
+			Assert.AreEqual(cardiffCity.Id, firstSearchCityResponse.Id);
+			Assert.AreEqual(cardiffCity.Name, firstSearchCityResponse.Name);
+			Assert.AreEqual(cardiffCity.SubRegion, firstSearchCityResponse.SubRegion);
+			Assert.AreEqual(cardiffCity.TouristRating, firstSearchCityResponse.TouristRating);
+			Assert.AreEqual(cardiffCity.EstablishedOn, firstSearchCityResponse.EstablishedOn);
+			Assert.AreEqual(cardiffCity.EstimatedPopulation, firstSearchCityResponse.EstimatedPopulation);
+
+			Assert.AreEqual(testCountry.Alpha2Code, firstSearchCityResponse.Country.Alpha2CountryCode);
+			Assert.AreEqual(testCountry.Alpha3Code, firstSearchCityResponse.Country.Alpha3CountryCode);
+			Assert.AreEqual(testCountry.Currencies.First().Code, firstSearchCityResponse.Country.Currencies.First());
+
+			Assert.AreEqual(testCurrentWeather.Weather.First().Description, firstSearchCityResponse.CurrentWeather.Description);
+			Assert.AreEqual(testCurrentWeather.Weather.First().Main, firstSearchCityResponse.CurrentWeather.Summary);
+			Assert.AreEqual(testCurrentWeather.Main.Humidity, firstSearchCityResponse.CurrentWeather.Humidity);
+			Assert.AreEqual(testCurrentWeather.Main.Pressure, firstSearchCityResponse.CurrentWeather.Pressure);			
+			Assert.AreEqual(testCurrentWeather.Main.Temp, firstSearchCityResponse.CurrentWeather.Temperature);
+			Assert.AreEqual(testCurrentWeather.Wind.Speed, firstSearchCityResponse.CurrentWeather.WindSpeed);
 		}
 
 		[TestMethod]
@@ -247,7 +249,7 @@
 					countriesServiceMocked.Object,
 					weatherServiceMocked.Object);
 
-				actualResult = controller.Post(testInputAddCityRequest);
+				actualResult = controller.Add(testInputAddCityRequest);
 			}
 			catch (Exception ex)
 			{
@@ -320,7 +322,7 @@
 					countriesServiceMocked.Object,
 					weatherServiceMocked.Object);
 
-				actualResult = controller.Put(testCityId, testInputUpdateCityRequest);
+				actualResult = controller.Update(testCityId, testInputUpdateCityRequest);
 			}
 			catch (Exception ex)
 			{

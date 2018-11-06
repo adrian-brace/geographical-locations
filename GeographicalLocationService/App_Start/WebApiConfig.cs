@@ -1,6 +1,9 @@
 ﻿namespace GeographicalLocationService
 {
+	using System.Collections.Generic;
 	using System.Web.Http;
+	using System.Web.Http.Filters;
+	using GeographicalLocationService.Filters;
 	using Swashbuckle.Application;
 
 	public static class WebApiConfig
@@ -23,6 +26,18 @@
 				name: "DefaultApi",
 				routeTemplate: "api/{controller}/{id}",
 				defaults: new { id = RouteParameter.Optional });
+
+			AddFilters(config);
+		}
+
+		private static void AddFilters(HttpConfiguration config)
+		{
+			config.Filters.AddRange(
+				new List<IFilter>
+				{
+					new ModelValidationFilterAttribute(),
+					new WebApiExceptionFilterAttribute()
+				});
 		}
 	}
 }

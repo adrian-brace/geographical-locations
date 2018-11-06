@@ -5,11 +5,13 @@
 	using System.Linq;
 	using System.Net;
 	using System.Net.Http;
+	using System.Threading.Tasks;
 	using System.Web.Http;
 	using GeographicalLocationService.Database;
 	using GeographicalLocationService.ExternalServices.Countries;
 	using GeographicalLocationService.ExternalServices.Weather;
-	using GeographicalLocationService.Models;
+	using GeographicalLocationService.Mappers;
+	using MODELS = GeographicalLocationService.Models;
 
 	public class CitiesController : ApiController
 	{
@@ -29,32 +31,100 @@
 			this._weatherService = weatherService;
 		}
 
-		// GET api/<controller>/{name}
 		[HttpGet]
-		public SearchCityResponse Get(string name)
+		public List<MODELS.SearchCityResponse> Search(string name)
 		{
-			throw new NotImplementedException();
+			var searchCityResponses = new List<MODELS.SearchCityResponse>();
+
+			var matchingCities = this._geographicalLocationsDatabase.Cities.Where(c => c.Name == name).ToList();
+
+			if (matchingCities == null || matchingCities.Count == 0)
+			{
+				throw new HttpResponseException(HttpStatusCode.NotFound);
+			}
+
+			var distinctCountryCodes = matchingCities.Select(c => c.CountryCode).Distinct().ToList();
+
+			var countriesDictionary = new Dictionary<string, Country>();
+			var weathersDictionary = new Dictionary<string, CurrentWeather>();
+
+			var tasks = new List<Task>();
+
+			distinctCountryCodes.ForEach(countryCode =>
+			{
+				tasks.Add(Task.Factory.StartNew(() =>
+				{
+					countriesDictionary.Add(countryCode, _countriesService.Get(countryCode));
+				}));
+
+				tasks.Add(Task.Factory.StartNew(() =>
+				{
+					weathersDictionary.Add(countryCode, _weatherService.Get(name, countryCode));
+				}));
+			});
+
+			TaskUtilities.WaitForTasks(tasks);
+
+			matchingCities.ForEach(matchedCity =>
+			{
+				var searchCityResponse = SearchCityResponseMapper.Map(
+					matchedCity,
+					countriesDictionary[matchedCity.CountryCode],
+					weathersDictionary[matchedCity.CountryCode]);
+
+				searchCityResponses.Add(searchCityResponse);
+			});
+
+			return searchCityResponses;
 		}
 
-		// POST api/<controller>
 		[HttpPost]
-		public int Post([FromBody]AddCityRequest addCityRequest)
+		public int Add([FromBody]MODELS.AddCityRequest addCityRequest)
 		{
-			throw new NotImplementedException();
+			this._geographicalLocationsDatabase.Cities.Add(new City()
+			{
+				CountryCode = addCityRequest.Country,
+				EstablishedOn = addCityRequest.EstablishedOn,
+				EstimatedPopulation = addCityRequest.EstimatedPopulation,
+				Name = addCityRequest.Name,
+				SubRegion = addCityRequest.SubRegion,
+				TouristRating = addCityRequest.TouristRating
+			});
+
+			return this._geographicalLocationsDatabase.SaveChanges();
 		}
 
-		// PUT api/<controller>/{id} (update)
 		[HttpPut]
-		public bool Put(int id, [FromBody]UpdateCityRequest updateCityRequest)
+		public bool Update(int id, [FromBody]MODELS.UpdateCityRequest updateCityRequest)
 		{
-			throw new NotImplementedException();
+			var cityToUpdate = this.GetCity(id);
+
+			cityToUpdate.EstablishedOn = updateCityRequest.EstablishedOn;
+			cityToUpdate.EstimatedPopulation = updateCityRequest.EstimatedPopulation;
+			cityToUpdate.TouristRating = updateCityRequest.TouristRating;
+
+			return this._geographicalLocationsDatabase.SaveChanges() > 0;
 		}
 
-		// DELETE api/<controller>/{id}
 		[HttpDelete]
 		public bool Delete(int id)
 		{
-			throw new NotImplementedException();
+			var cityToDelete = this.GetCity(id);
+
+			this._geographicalLocationsDatabase.Cities.Remove(cityToDelete);
+			return this._geographicalLocationsDatabase.SaveChanges() > 0;
+		}
+
+		private City GetCity(int id)
+		{
+			var cityToDelete = this._geographicalLocationsDatabase.Cities.Where(city => city.Id == id).FirstOrDefault();
+
+			if (cityToDelete == null)
+			{
+				throw new HttpResponseException(HttpStatusCode.NotFound);
+			}
+
+			return cityToDelete;
 		}
 	}
 }
