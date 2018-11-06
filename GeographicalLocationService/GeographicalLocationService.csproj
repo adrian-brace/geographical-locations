@@ -184,10 +184,18 @@
       <DependentUpon>GeographicalLocationsModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Database\IGeographicalLocationsDatabase.cs" />
+    <Compile Include="ExternalServices\Countries\CountriesService.cs" />
+    <Compile Include="ExternalServices\Countries\Country.cs" />
+    <Compile Include="ExternalServices\Countries\ICountriesService.cs" />
+    <Compile Include="ExternalServices\Weather\CurrentWeather.cs" />
+    <Compile Include="ExternalServices\Weather\IWeatherService.cs" />
+    <Compile Include="ExternalServices\Weather\WeatherService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AddCityRequest.cs" />
+    <Compile Include="Models\City.cs" />
+    <Compile Include="Models\SearchCityResponse.cs" />
     <Compile Include="Models\UpdateCityRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -7,41 +7,52 @@
 	using System.Net.Http;
 	using System.Web.Http;
 	using GeographicalLocationService.Database;
+	using GeographicalLocationService.ExternalServices.Countries;
+	using GeographicalLocationService.ExternalServices.Weather;
 	using GeographicalLocationService.Models;
 
 	public class CitiesController : ApiController
 	{
 		private readonly IGeographicalLocationsDatabase _geographicalLocationsDatabase;
 
-		public CitiesController(IGeographicalLocationsDatabase geographicalLocationsDatabase)
+		private readonly ICountriesService _countriesService;
+
+		private readonly IWeatherService _weatherService;
+
+		public CitiesController(
+			IGeographicalLocationsDatabase geographicalLocationsDatabase,
+			ICountriesService countriesService,
+			IWeatherService weatherService)
 		{
 			this._geographicalLocationsDatabase = geographicalLocationsDatabase;
+			this._countriesService = countriesService;
+			this._weatherService = weatherService;
 		}
 
-		// GET api/<controller>/5
+		// GET api/<controller>/{name}
 		[HttpGet]
-		public string Get(int id)
+		public SearchCityResponse Get(string name)
 		{
 			throw new NotImplementedException();
 		}
 
 		// POST api/<controller>
 		[HttpPost]
-		public void Post([FromBody]AddCityRequest addCityRequest)
+		public int Post([FromBody]AddCityRequest addCityRequest)
 		{
 			throw new NotImplementedException();
 		}
 
-		// PUT api/<controller>/5 (update)
+		// PUT api/<controller>/{id} (update)
 		[HttpPut]
-		public void Put(int id, [FromBody]UpdateCityRequest updateCityRequest)
+		public bool Put(int id, [FromBody]UpdateCityRequest updateCityRequest)
 		{
 			throw new NotImplementedException();
 		}
 
-		// DELETE api/<controller>/5
+		// DELETE api/<controller>/{id}
 		[HttpDelete]
-		public void Delete(int id)
+		public bool Delete(int id)
 		{
 			throw new NotImplementedException();
 		}

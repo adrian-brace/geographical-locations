@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="GeographicalLocationsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="GeographicalLocationsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cities">
           <Key>
             <PropertyRef Name="Id" />
@@ -12,7 +12,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="SubRegion" Type="nvarchar" MaxLength="128" />
-          <Property Name="Country" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="CountryCode" Type="varchar" MaxLength="2" Nullable="false" />
           <Property Name="TouristRating" Type="tinyint" />
           <Property Name="EstablishedOn" Type="date" />
           <Property Name="EstimatedPopulation" Type="int" />
@@ -20,8 +20,7 @@
         <EntityContainer Name="GeographicalLocationsModelStoreContainer">
           <EntitySet Name="Cities" EntityType="Self.Cities" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="GeographicalLocationsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -32,10 +31,10 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="SubRegion" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="Country" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TouristRating" Type="Byte" />
           <Property Name="EstablishedOn" Type="DateTime" Precision="0" />
           <Property Name="EstimatedPopulation" Type="Int32" />
+          <Property Name="CountryCode" Type="String" Nullable="false" MaxLength="2" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityContainer Name="GeographicalLocationsEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Cities" EntityType="Self.City" />
@@ -49,10 +48,10 @@
           <EntitySetMapping Name="Cities">
             <EntityTypeMapping TypeName="GeographicalLocationsModel.City">
               <MappingFragment StoreEntitySet="Cities">
+                <ScalarProperty Name="CountryCode" ColumnName="CountryCode" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="SubRegion" ColumnName="SubRegion" />
-                <ScalarProperty Name="Country" ColumnName="Country" />
                 <ScalarProperty Name="TouristRating" ColumnName="TouristRating" />
                 <ScalarProperty Name="EstablishedOn" ColumnName="EstablishedOn" />
                 <ScalarProperty Name="EstimatedPopulation" ColumnName="EstimatedPopulation" />

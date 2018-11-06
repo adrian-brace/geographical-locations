@@ -17,9 +17,9 @@ namespace GeographicalLocationService.Database
         public int Id { get; set; }
         public string Name { get; set; }
         public string SubRegion { get; set; }
-        public string Country { get; set; }
         public Nullable<byte> TouristRating { get; set; }
         public Nullable<System.DateTime> EstablishedOn { get; set; }
         public Nullable<int> EstimatedPopulation { get; set; }
+        public string CountryCode { get; set; }
     }
 }
