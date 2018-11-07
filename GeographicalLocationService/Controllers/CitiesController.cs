@@ -81,7 +81,7 @@
 		[HttpPost]
 		public int Add([FromBody]MODELS.AddCityRequest addCityRequest)
 		{
-			this._geographicalLocationsDatabase.Cities.Add(new City()
+			var newCity = this._geographicalLocationsDatabase.Cities.Add(new City()
 			{
 				CountryCode = addCityRequest.Country,
 				EstablishedOn = addCityRequest.EstablishedOn,
@@ -91,11 +91,12 @@
 				TouristRating = addCityRequest.TouristRating
 			});
 
-			return this._geographicalLocationsDatabase.SaveChanges();
+			this._geographicalLocationsDatabase.SaveChanges();
+			return newCity.Id;
 		}
 
 		[HttpPut]
-		public bool Update(int id, [FromBody]MODELS.UpdateCityRequest updateCityRequest)
+		public int Update(int id, [FromBody]MODELS.UpdateCityRequest updateCityRequest)
 		{
 			var cityToUpdate = this.GetCity(id);
 
@@ -103,14 +104,13 @@
 			cityToUpdate.EstimatedPopulation = updateCityRequest.EstimatedPopulation;
 			cityToUpdate.TouristRating = updateCityRequest.TouristRating;
 
-			return this._geographicalLocationsDatabase.SaveChanges() > 0;
+			return this._geographicalLocationsDatabase.SaveChanges();
 		}
 
 		[HttpDelete]
 		public bool Delete(int id)
 		{
 			var cityToDelete = this.GetCity(id);
-
 			this._geographicalLocationsDatabase.Cities.Remove(cityToDelete);
 			return this._geographicalLocationsDatabase.SaveChanges() > 0;
 		}

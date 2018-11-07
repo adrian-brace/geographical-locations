@@ -38,9 +38,13 @@
 			var citiesMocked = new Mock<DbSet<City>>();
 			citiesMocked.As<IQueryable<City>>().Setup(m => m.Provider).Returns(cities.AsQueryable().Provider);
 			citiesMocked.As<IQueryable<City>>().Setup(m => m.Expression).Returns(cities.AsQueryable().Expression);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.ElementType).Returns(cities.AsQueryable().ElementType);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.GetEnumerator()).Returns(cities.AsQueryable().GetEnumerator);
+			citiesMocked.Setup(db => db.Remove(cityToDelete)).Callback<City>((city) => cities.Remove(city));
 
 			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
-			geographicalLocationsDatabaseMocked.Setup(db => db.Cities.Remove(cityToDelete)).Callback<City>((city) => cities.Remove(city));
+			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object).Verifiable();
+			geographicalLocationsDatabaseMocked.Setup(db => db.SaveChanges()).Returns(1).Verifiable();
 
 			var countriesServiceMocked = new Mock<ICountriesService>();
 			var weatherServiceMocked = new Mock<IWeatherService>();
@@ -202,7 +206,7 @@
 		}
 
 		[TestMethod]
-		public void Post()
+		public void Add()
 		{
 			// Arrange
 			var testInputAddCityRequest = new MODELS.AddCityRequest()
@@ -215,7 +219,7 @@
 				TouristRating = 5
 			};
 
-			var addedCity = new City()
+			var newCity = new City()
 			{
 				Id = 1234,
 				CountryCode = "GB",
@@ -231,9 +235,11 @@
 			var citiesMocked = new Mock<DbSet<City>>();
 			citiesMocked.As<IQueryable<City>>().Setup(m => m.Provider).Returns(cities.AsQueryable().Provider);
 			citiesMocked.As<IQueryable<City>>().Setup(m => m.Expression).Returns(cities.AsQueryable().Expression);
+			citiesMocked.Setup(db => db.Add(It.IsAny<City>())).Returns(newCity).Callback<City>((city) => cities.Add(newCity));
 
 			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
-			geographicalLocationsDatabaseMocked.Setup(db => db.Cities.Add(addedCity)).Callback<City>((city) => cities.Add(city));
+			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object).Verifiable();
+			geographicalLocationsDatabaseMocked.Setup(db => db.SaveChanges()).Returns(1).Verifiable();
 
 			var countriesServiceMocked = new Mock<ICountriesService>();
 			var weatherServiceMocked = new Mock<IWeatherService>();
@@ -266,12 +272,12 @@
 
 			// Assert
 			Mock.VerifyAll(geographicalLocationsDatabaseMocked);
-			Assert.AreEqual(addedCity.Id, actualResult, "Expected a non zero City ID to be returned");
-			Assert.IsTrue(cities.Any(c => c.Id == addedCity.Id));
+			Assert.AreEqual(newCity.Id, actualResult, "Expected a non zero City ID to be returned");
+			Assert.IsTrue(cities.Any(c => c.Id == newCity.Id));
 		}
 
 		[TestMethod]
-		public void Put()
+		public void Update()
 		{
 			// Arrange
 			var testCityId = 1234;
@@ -305,13 +311,13 @@
 			citiesMocked.As<IQueryable<City>>().Setup(m => m.GetEnumerator()).Returns(() => cities.AsQueryable().GetEnumerator());
 
 			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
-			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object);
-			geographicalLocationsDatabaseMocked.Setup(db => db.SaveChanges()).Returns(1);
+			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object).Verifiable();
+			geographicalLocationsDatabaseMocked.Setup(db => db.SaveChanges()).Returns(1).Verifiable();
 
 			var countriesServiceMocked = new Mock<ICountriesService>();
 			var weatherServiceMocked = new Mock<IWeatherService>();
 
-			bool actualResult = false;
+			var actualResult = 0;
 			CitiesController controller = null;
 
 			// Act
@@ -339,8 +345,8 @@
 
 			// Assert
 			Mock.VerifyAll(geographicalLocationsDatabaseMocked);
-			Assert.IsTrue(actualResult, "Expected API to report that the City was successfully updated.");
-			Assert.IsTrue(cities.Any(c => c.Id == updatedCity.Id));
+			Assert.AreEqual(1, actualResult, "Expected API to report that one City row was successfully updated.");
+			Assert.IsTrue(cities.Any(c => c.Id == updatedCity.Id));			
 		}
 	}
 }

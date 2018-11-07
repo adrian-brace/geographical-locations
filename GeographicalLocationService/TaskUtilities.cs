@@ -11,7 +11,7 @@
 		{
 			try
 			{
-				Task.WhenAll(tasks);
+				Task.WaitAll(tasks.ToArray());
 			}
 			catch (AggregateException aex)
 			{
