@@ -8,6 +8,8 @@
 
 		public const string CurrentWeatherCacheTimeMinutes = "CurrentWeatherCacheTimeMinutes";
 
-		public const string WeatherServiceBaseUri = "WeatherServiceBaseUri";		
+		public const string WeatherServiceBaseUri = "WeatherServiceBaseUri";
+
+		public const string OpenWeatherMapApiKey = "OpenWeatherMapApiKey";
 	}
 }

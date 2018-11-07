@@ -13,6 +13,8 @@
 
 		private readonly string _weatherServiceBaseUri = WebConfigurationManager.AppSettings[ApplicationSettingKeyNames.WeatherServiceBaseUri];
 
+		private readonly string _openWeatherMapApiKey = WebConfigurationManager.AppSettings[ApplicationSettingKeyNames.OpenWeatherMapApiKey];		
+
 		private IHttpClientHelper _httpClientHelper;
 
 		public WeatherService(IHttpClientHelper httpClientHelper)
@@ -36,7 +38,8 @@
 
 		private Dictionary<string, CurrentWeather> GetWeather(string criteriaPairing)
 		{
-			var response = this._httpClientHelper.GetResponse<CurrentWeather>(new Uri(this._weatherServiceBaseUri));
+			var uri = new Uri($"{this._weatherServiceBaseUri}?q={criteriaPairing}&appid={this._openWeatherMapApiKey}");
+			var response = this._httpClientHelper.GetResponse<CurrentWeather>(uri);
 			var currentWeathers = new Dictionary<string, CurrentWeather>();
 			currentWeathers.Add(criteriaPairing, response);
 			return currentWeathers;
