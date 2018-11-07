@@ -1,0 +1,1 @@
+﻿CREATE NONCLUSTERED INDEX [nc_idx_Cities_Name] ON [dbo].[Cities]([Name])
