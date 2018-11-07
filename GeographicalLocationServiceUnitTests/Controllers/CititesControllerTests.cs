@@ -4,6 +4,8 @@
 	using System.Collections.Generic;
 	using System.Data.Entity;
 	using System.Linq;
+	using AutoMapper;
+	using GeographicalLocationService.App_Start;
 	using GeographicalLocationService.Controllers;
 	using GeographicalLocationService.Database;
 	using GeographicalLocationService.ExternalServices.Countries;
@@ -15,6 +17,12 @@
 	[TestClass]
 	public class CititesControllerTests
 	{
+		[AssemblyInitialize]
+		public static void AssemblyInit(TestContext context)
+		{
+			AutoMapperConfig.Initialize();
+		}
+
 		[TestMethod]
 		public void Delete()
 		{

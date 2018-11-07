@@ -7,6 +7,7 @@
 	using System.Net.Http;
 	using System.Threading.Tasks;
 	using System.Web.Http;
+	using AutoMapper;
 	using GeographicalLocationService.Database;
 	using GeographicalLocationService.ExternalServices.Countries;
 	using GeographicalLocationService.ExternalServices.Weather;
@@ -91,18 +92,10 @@
 		[HttpPost]
 		public int Add([FromBody]MODELS.AddCityRequest addCityRequest)
 		{
-			var newCity = this._geographicalLocationsDatabase.Cities.Add(new City()
-			{
-				CountryCode = addCityRequest.Country,
-				EstablishedOn = addCityRequest.EstablishedOn,
-				EstimatedPopulation = addCityRequest.EstimatedPopulation,
-				Name = addCityRequest.Name,
-				SubRegion = addCityRequest.SubRegion,
-				TouristRating = addCityRequest.TouristRating
-			});
-
+			City cityToAdd = Mapper.Map<MODELS.AddCityRequest, City>(addCityRequest);
+			var addedCity = this._geographicalLocationsDatabase.Cities.Add(cityToAdd);
 			this._geographicalLocationsDatabase.SaveChanges();
-			return newCity.Id;
+			return addedCity.Id;
 		}
 
 		/// <summary>
