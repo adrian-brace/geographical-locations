@@ -11,11 +11,6 @@
 	[AttributeUsage(AttributeTargets.Class)]
 	public sealed class ModelValidationFilterAttribute : ActionFilterAttribute
 	{
-		/// <summary>
-		/// Occurs before the action method is invoked.
-		/// </summary>
-		/// <param name="actionContext">The action context.</param>
-		/// <exception cref="System.ArgumentNullException">Action Context</exception>
 		[SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope", Justification = "Response instance will be disposed later by the garbage collector.")]
 		public override void OnActionExecuting(HttpActionContext actionContext)
 		{

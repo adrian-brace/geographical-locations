@@ -5,17 +5,6 @@
 
 	public static class CacheUtilities
 	{
-		/// <summary>
-		/// A generic method for getting and setting objects to the memory cache.
-		/// </summary>
-		/// <typeparam name="T">The type of the object to be returned.</typeparam>
-		/// <param name="cacheItemName">The name to be used when storing this object in the cache.</param>
-		/// <param name="cacheTimeInMinutes">How long to cache this object for.</param>
-		/// <param name="objectSettingFunction">A function to call if the object isn't in the cache and you need to set it.</param>
-		/// <param name="functionParameter">A parameter to pass into the function that was passed in.</param>
-		/// <returns>
-		/// An object of the type you asked for
-		/// </returns>
 		public static T GetObjectFromCache<T>(string cacheItemName, int cacheTimeInMinutes, Func<string, T> objectSettingFunction, string functionParameter)
 		{
 			if (objectSettingFunction == null)
@@ -37,16 +26,6 @@
 			return cachedObject;
 		}
 
-		/// <summary>
-		/// A generic method for getting and setting objects to the memory cache.
-		/// </summary>
-		/// <typeparam name="T">The type of the object to be returned.</typeparam>
-		/// <param name="cacheItemName">The name to be used when storing this object in the cache.</param>
-		/// <param name="cacheTimeInMinutes">How long to cache this object for.</param>
-		/// <param name="objectSettingFunction">A function to call if the object isn't in the cache and you need to set it.</param>
-		/// <returns>
-		/// An object of the type you asked for
-		/// </returns>
 		public static T GetObjectFromCache<T>(string cacheItemName, int cacheTimeInMinutes, Func<T> objectSettingFunction)
 		{
 			if (objectSettingFunction == null)
