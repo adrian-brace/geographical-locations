@@ -31,7 +31,12 @@
 			this._weatherService = weatherService;
 		}
 
-		[HttpGet]
+		/// <summary>
+		/// Search for Cities by name
+		/// </summary>
+		/// <param name="name">City name</param>
+		/// <returns>List of search city responses</returns>
+		[HttpGet]		
 		public List<MODELS.SearchCityResponse> Search(string name)
 		{
 			var searchCityResponses = new List<MODELS.SearchCityResponse>();
@@ -78,6 +83,11 @@
 			return searchCityResponses;
 		}
 
+		/// <summary>
+		/// Add a new City
+		/// </summary>
+		/// <param name="addCityRequest">Add city request</param>
+		/// <returns>City ID</returns>
 		[HttpPost]
 		public int Add([FromBody]MODELS.AddCityRequest addCityRequest)
 		{
@@ -95,6 +105,12 @@
 			return newCity.Id;
 		}
 
+		/// <summary>
+		/// Update an existing City
+		/// </summary>
+		/// <param name="id">City ID</param>
+		/// <param name="updateCityRequest">Update city request</param>
+		/// <returns>Number of rows affected</returns>
 		[HttpPut]
 		public int Update(int id, [FromBody]MODELS.UpdateCityRequest updateCityRequest)
 		{
@@ -107,6 +123,11 @@
 			return this._geographicalLocationsDatabase.SaveChanges();
 		}
 
+		/// <summary>
+		/// Delete an existing City
+		/// </summary>
+		/// <param name="id">City ID</param>
+		/// <returns>Number of rows affected</returns>
 		[HttpDelete]
 		public bool Delete(int id)
 		{
