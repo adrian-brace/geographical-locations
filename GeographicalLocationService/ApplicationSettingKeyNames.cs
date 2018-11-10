@@ -11,5 +11,9 @@
 		public const string WeatherServiceBaseUri = "WeatherServiceBaseUri";
 
 		public const string OpenWeatherMapApiKey = "OpenWeatherMapApiKey";
+
+		public const string RequestLoggingIsEnabled = "RequestLoggingIsEnabled";
+
+		public const string ErrorLoggingIsEnabled = "ErrorLoggingIsEnabled";
 	}
 }

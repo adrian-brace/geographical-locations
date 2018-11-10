@@ -3,6 +3,7 @@
 	using System;
 	using System.Net;
 	using System.Net.Http;
+	using System.Web.Configuration;
 	using System.Web.Http.Filters;
 	using GeographicalLocationService.Logging;
 
@@ -16,7 +17,10 @@
 				throw new ArgumentNullException("actionExecutedContext");
 			}
 
-			Logger.RecordException(actionExecutedContext.Exception);
+			if (bool.Parse(WebConfigurationManager.AppSettings[ApplicationSettingKeyNames.ErrorLoggingIsEnabled]))
+			{
+				Logger.RecordException(actionExecutedContext.Exception);
+			}
 
 			if (actionExecutedContext.Exception is NotImplementedException)
 			{

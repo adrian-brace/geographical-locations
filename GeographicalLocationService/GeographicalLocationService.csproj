@@ -203,6 +203,7 @@
     <Compile Include="ExternalServices\Weather\Main.cs" />
     <Compile Include="ExternalServices\Weather\Weather.cs" />
     <Compile Include="ExternalServices\Weather\Wind.cs" />
+    <Compile Include="Filters\RequestLoggingFilterAttribute.cs" />
     <Compile Include="Filters\ModelValidationFilterAttribute.cs" />
     <Compile Include="Filters\ValidationErrorResponse.cs" />
     <Compile Include="Filters\WebApiExceptionFilterAttribute.cs" />
