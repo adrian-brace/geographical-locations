@@ -225,6 +225,7 @@
     <Compile Include="Models\UpdateCityRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaskUtilities.cs" />
+    <Compile Include="Validation\ISODateTimeAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\CustomDictionary.xml">

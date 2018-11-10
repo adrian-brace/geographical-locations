@@ -19,14 +19,14 @@
 
 		public RS GetResponse<RS>(Uri baseRequestUri)
 		{
-			var result = Task.Run(() => this.GetAsync(baseRequestUri, DefaultRequestTimeoutSeconds)).Result;
+			var result = Task.Run(() => GetAsync(baseRequestUri, DefaultRequestTimeoutSeconds)).Result;
 			result.EnsureSuccessStatusCode();
 			return JsonConvert.DeserializeObject<RS>(result.Content.ReadAsStringAsync().Result);
 		}
 
 		public RS GetResponse<RS>(Uri baseRequestUri, int timeoutSeconds)
 		{
-			var result = Task.Run(() => this.GetAsync(baseRequestUri, timeoutSeconds)).Result;
+			var result = Task.Run(() => GetAsync(baseRequestUri, timeoutSeconds)).Result;
 			result.EnsureSuccessStatusCode();
 			return JsonConvert.DeserializeObject<RS>(result.Content.ReadAsStringAsync().Result);
 		}

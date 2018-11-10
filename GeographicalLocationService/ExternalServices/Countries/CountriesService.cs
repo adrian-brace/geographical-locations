@@ -16,12 +16,12 @@
 
 		public CountriesService(IHttpClientHelper httpClientHelper)
 		{
-			this._httpClientHelper = httpClientHelper;
+			_httpClientHelper = httpClientHelper;
 		}
 
 		public Country Get(string countryCode)
 		{
-			var cachedCountries = CacheUtilities.GetObjectFromCache($"CountriesCache", this._countryCacheTimeMinutes, this.GetAllCountries);
+			var cachedCountries = CacheUtilities.GetObjectFromCache($"CountriesCache", _countryCacheTimeMinutes, GetAllCountries);
 
 			if (!cachedCountries.ContainsKey(countryCode))
 			{

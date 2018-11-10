@@ -219,7 +219,7 @@
 			var testInputAddCityRequest = new MODELS.AddCityRequest()
 			{
 				CountryCode = "GB",
-				EstablishedOn = new DateTime(1536, 1, 1),
+				EstablishedOn = new DateTime(1536, 1, 1).ToString("yyyy-MM-dd"),
 				EstimatedPopulation = 250000,
 				Name = "Cardiff",
 				SubRegion = "Glamorgan",
@@ -291,7 +291,7 @@
 			var testCityId = 1234;
 			var testInputUpdateCityRequest = new MODELS.UpdateCityRequest()
 			{
-				EstablishedOn = new DateTime(1536, 1, 1),
+				EstablishedOn = new DateTime(1536, 1, 1).ToString("yyyy-MM-dd"),
 				EstimatedPopulation = 250000,
 				TouristRating = 5
 			};

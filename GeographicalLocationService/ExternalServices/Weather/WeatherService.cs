@@ -26,7 +26,7 @@
 		{
 			var criteriaPairing = $"{cityName},{countryCode}";
 
-			var cachedCurrentWeather = CacheUtilities.GetObjectFromCache($"WeatherCache{criteriaPairing}", this._currentWeatherCacheTimeMinutes, this.GetWeather, criteriaPairing);
+			var cachedCurrentWeather = CacheUtilities.GetObjectFromCache($"WeatherCache{criteriaPairing}", _currentWeatherCacheTimeMinutes, GetWeather, criteriaPairing);
 
 			if (!cachedCurrentWeather.ContainsKey(criteriaPairing))
 			{
@@ -38,7 +38,7 @@
 
 		private Dictionary<string, CurrentWeather> GetWeather(string criteriaPairing)
 		{
-			var uri = new Uri($"{this._weatherServiceBaseUri}?q={criteriaPairing}&appid={this._openWeatherMapApiKey}");
+			var uri = new Uri($"{_weatherServiceBaseUri}?q={criteriaPairing}&appid={_openWeatherMapApiKey}");
 			var response = this._httpClientHelper.GetResponse<CurrentWeather>(uri);
 			var currentWeathers = new Dictionary<string, CurrentWeather>();
 			currentWeathers.Add(criteriaPairing, response);

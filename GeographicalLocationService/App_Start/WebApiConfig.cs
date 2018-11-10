@@ -4,6 +4,7 @@
 	using System.Web.Http;
 	using System.Web.Http.Filters;
 	using GeographicalLocationService.Filters;
+	using Newtonsoft.Json.Converters;
 	using Swashbuckle.Application;
 
 	public static class WebApiConfig
@@ -11,6 +12,7 @@
 		public static void Register(HttpConfiguration config)
 		{
 			// Web API configuration and services
+			config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new IsoDateTimeConverter() { DateTimeFormat = "yyyy-MM-dd" });
 
 			// Web API routes
 			config.MapHttpAttributeRoutes();

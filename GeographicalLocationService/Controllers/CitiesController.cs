@@ -1,8 +1,10 @@
 ﻿namespace GeographicalLocationService.Controllers
 {
+	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Net;
+	using System.Net.Http;
 	using System.Threading.Tasks;
 	using System.Web.Http;
 	using AutoMapper;
@@ -25,9 +27,9 @@
 			ICountriesService countriesService,
 			IWeatherService weatherService)
 		{
-			this._geographicalLocationsDatabase = geographicalLocationsDatabase;
-			this._countriesService = countriesService;
-			this._weatherService = weatherService;
+			_geographicalLocationsDatabase = geographicalLocationsDatabase;
+			_countriesService = countriesService;
+			_weatherService = weatherService;
 		}
 
 		/// <summary>
@@ -40,11 +42,15 @@
 		{
 			var searchCityResponses = new List<MODELS.SearchCityResponse>();
 
-			var matchingCities = this._geographicalLocationsDatabase.Cities.Where(c => c.Name == name).ToList();
+			var matchingCities = _geographicalLocationsDatabase.Cities.Where(c => c.Name == name).ToList();
 
 			if (matchingCities == null || matchingCities.Count == 0)
 			{
-				throw new HttpResponseException(HttpStatusCode.NotFound);
+				var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
+				{
+					Content = new StringContent($"No city with Name {name}"),
+					ReasonPhrase = "City Name Not Found"
+				};
 			}
 
 			var distinctCountryCodes = matchingCities.Select(c => c.CountryCode).Distinct().ToList();
@@ -91,8 +97,8 @@
 		public MODELS.AddCityResponse Add([FromBody]MODELS.AddCityRequest addCityRequest)
 		{
 			City cityToAdd = Mapper.Map<MODELS.AddCityRequest, City>(addCityRequest);
-			var addedCity = this._geographicalLocationsDatabase.Cities.Add(cityToAdd);
-			this._geographicalLocationsDatabase.SaveChanges();
+			var addedCity = _geographicalLocationsDatabase.Cities.Add(cityToAdd);
+			_geographicalLocationsDatabase.SaveChanges();
 
 			return new MODELS.AddCityResponse()
 			{
@@ -110,13 +116,13 @@
 		[HttpPut]
 		public int Update(int id, [FromBody]MODELS.UpdateCityRequest updateCityRequest)
 		{
-			var cityToUpdate = this.GetCity(id);
+			var cityToUpdate = GetCity(id);
 
-			cityToUpdate.EstablishedOn = updateCityRequest.EstablishedOn;
+			cityToUpdate.EstablishedOn = !string.IsNullOrEmpty(updateCityRequest.EstablishedOn) ? DateTime.Parse(updateCityRequest.EstablishedOn) : (DateTime?)null;
 			cityToUpdate.EstimatedPopulation = updateCityRequest.EstimatedPopulation;
 			cityToUpdate.TouristRating = updateCityRequest.TouristRating;
 
-			return this._geographicalLocationsDatabase.SaveChanges();
+			return _geographicalLocationsDatabase.SaveChanges();
 		}
 
 		/// <summary>
@@ -127,18 +133,23 @@
 		[HttpDelete]
 		public int Delete(int id)
 		{
-			var cityToDelete = this.GetCity(id);
-			this._geographicalLocationsDatabase.Cities.Remove(cityToDelete);
-			return this._geographicalLocationsDatabase.SaveChanges();
+			var cityToDelete = GetCity(id);
+			_geographicalLocationsDatabase.Cities.Remove(cityToDelete);
+			return _geographicalLocationsDatabase.SaveChanges();
 		}
 
 		private City GetCity(int id)
 		{
-			var cityToDelete = this._geographicalLocationsDatabase.Cities.Where(city => city.Id == id).FirstOrDefault();
+			var cityToDelete = _geographicalLocationsDatabase.Cities.Where(city => city.Id == id).FirstOrDefault();
 
 			if (cityToDelete == null)
 			{
-				throw new HttpResponseException(HttpStatusCode.NotFound);
+				var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
+				{
+					Content = new StringContent($"No city with ID {id}"),
+					ReasonPhrase = "City ID Not Found"
+				};
+				throw new HttpResponseException(resp);
 			}
 
 			return cityToDelete;
