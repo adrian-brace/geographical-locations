@@ -56,7 +56,7 @@
 			var countriesServiceMocked = new Mock<ICountriesService>();
 			var weatherServiceMocked = new Mock<IWeatherService>();
 
-			bool actualResult = false;
+			int actualResult = 0;
 			CitiesController controller = null;
 
 			// Act
@@ -84,7 +84,7 @@
 
 			// Assert
 			Mock.VerifyAll(geographicalLocationsDatabaseMocked);
-			Assert.IsTrue(actualResult, "Expected City to be successfully deleted");
+			Assert.IsTrue(actualResult == 1, "Expected City to be successfully deleted");
 			Assert.IsTrue(cities.Count == 0);
 		}
 
@@ -218,7 +218,7 @@
 			// Arrange
 			var testInputAddCityRequest = new MODELS.AddCityRequest()
 			{
-				Country = "GB",
+				CountryCode = "GB",
 				EstablishedOn = new DateTime(1536, 1, 1),
 				EstimatedPopulation = 250000,
 				Name = "Cardiff",
@@ -251,7 +251,7 @@
 			var countriesServiceMocked = new Mock<ICountriesService>();
 			var weatherServiceMocked = new Mock<IWeatherService>();
 
-			int actualResult = 0;
+			MODELS.AddCityResponse actualResult = null;
 			CitiesController controller = null;
 
 			// Act
@@ -279,7 +279,8 @@
 
 			// Assert
 			Mock.VerifyAll(geographicalLocationsDatabaseMocked);
-			Assert.AreEqual(newCity.Id, actualResult, "Expected a non zero City ID to be returned");
+			Assert.AreEqual(newCity.Id, actualResult.Id, "Expected a non zero City ID to be returned");
+			Assert.AreEqual($"~/api/Cities/{newCity.Name}", actualResult.SearchUri, "Expected search Uri to be returned.");
 			Assert.IsTrue(cities.Any(c => c.Id == newCity.Id));
 		}
 

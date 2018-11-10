@@ -10,9 +10,7 @@
 		{
 			Mapper.Initialize((config) =>
 			{
-				config.CreateMap<MODELS.AddCityRequest, City>()
-				.ForMember(acr => acr.CountryCode, m => m.MapFrom(c => c.Country))
-				.ReverseMap();
+				config.CreateMap<MODELS.AddCityRequest, City>().ReverseMap();
 			});
 		}
 	}

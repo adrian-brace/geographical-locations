@@ -1,10 +1,6 @@
 ﻿namespace GeographicalLocationService.Models
 {
-	using System;
-	using System.Collections.Generic;
 	using System.ComponentModel.DataAnnotations;
-	using System.Linq;
-	using System.Web;
 
 	public class AddCityRequest : UpdateCityRequest
 	{
@@ -15,8 +11,12 @@
 		[MaxLength(128)]
 		public string SubRegion { get; set; }
 
+		/// <summary>
+		/// Gets or sets the country code
+		/// </summary>
+		/// <remarks>International Organization for Standardization, ISO Alpha-2</remarks>
 		[Required]
-		[MaxLength(64)]
-		public string Country { get; set; }
+		[MaxLength(2)]
+		public string CountryCode { get; set; }
 	}
 }

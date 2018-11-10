@@ -208,6 +208,7 @@
     <Compile Include="Filters\WebApiExceptionFilterAttribute.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Mappers\SearchCityResponseMapper.cs" />
+    <Compile Include="Models\AddCityResponse.cs" />
     <Compile Include="Models\Country.cs" />
     <Compile Include="ExternalServices\Countries\ICountriesService.cs" />
     <Compile Include="Models\CurrentWeather.cs" />

@@ -10,7 +10,7 @@
 	using GeographicalLocationService.ExternalServices.Countries;
 	using GeographicalLocationService.ExternalServices.Weather;
 	using GeographicalLocationService.Mappers;
-	using MODELS = GeographicalLocationService.Models;
+	using MODELS = Models;
 
 	public class CitiesController : ApiController
 	{
@@ -88,12 +88,17 @@
 		/// <param name="addCityRequest">Add city request</param>
 		/// <returns>City ID</returns>
 		[HttpPost]
-		public int Add([FromBody]MODELS.AddCityRequest addCityRequest)
+		public MODELS.AddCityResponse Add([FromBody]MODELS.AddCityRequest addCityRequest)
 		{
 			City cityToAdd = Mapper.Map<MODELS.AddCityRequest, City>(addCityRequest);
 			var addedCity = this._geographicalLocationsDatabase.Cities.Add(cityToAdd);
 			this._geographicalLocationsDatabase.SaveChanges();
-			return addedCity.Id;
+
+			return new MODELS.AddCityResponse()
+			{
+				Id = addedCity.Id,
+				SearchUri = $"~/api/{typeof(CitiesController).Name.Replace("Controller", string.Empty)}/{addedCity.Name}",
+			};
 		}
 
 		/// <summary>
@@ -120,11 +125,11 @@
 		/// <param name="id">City ID</param>
 		/// <returns>Number of rows affected</returns>
 		[HttpDelete]
-		public bool Delete(int id)
+		public int Delete(int id)
 		{
 			var cityToDelete = this.GetCity(id);
 			this._geographicalLocationsDatabase.Cities.Remove(cityToDelete);
-			return this._geographicalLocationsDatabase.SaveChanges() > 0;
+			return this._geographicalLocationsDatabase.SaveChanges();
 		}
 
 		private City GetCity(int id)
