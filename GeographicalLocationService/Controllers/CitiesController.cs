@@ -11,6 +11,7 @@
 	using GeographicalLocationService.Database;
 	using GeographicalLocationService.ExternalServices.Countries;
 	using GeographicalLocationService.ExternalServices.Weather;
+	using GeographicalLocationService.Logging;
 	using GeographicalLocationService.Mappers;
 	using MODELS = Models;
 
@@ -47,7 +48,7 @@
 			{
 				var resp = new HttpResponseMessage(HttpStatusCode.BadRequest)
 				{
-					Content = new StringContent($"Country Code {cityToAdd.CountryCode} was not recognised as a valid country code."),
+					Content = new StringContent($"Country Code {cityToAdd.CountryCode} was not recognised as a valid country code or there is a problem with the external Countries Service."),
 					ReasonPhrase = "Country Code Invalid"
 				};
 				throw new HttpResponseException(resp);
@@ -118,8 +119,8 @@
 			{
 				var searchCityResponse = SearchCityResponseMapper.Map(
 					matchedCity,
-					countriesDictionary[matchedCity.CountryCode],
-					weathersDictionary[matchedCity.CountryCode]);
+					countriesDictionary,
+					weathersDictionary);
 
 				searchCityResponses.Add(searchCityResponse);
 			});
@@ -159,7 +160,7 @@
 			}
 
 			return matchingCities;
-		}
+		}		
 
 		private List<Task> CallExternalServices(
 			string name,

@@ -20,7 +20,11 @@
 				CacheItemPolicy policy = new CacheItemPolicy();
 				policy.AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(cacheTimeInMinutes);
 				cachedObject = objectSettingFunction(functionParameter);
-				cache.Set(cacheItemName, cachedObject, policy);
+
+				if (cachedObject != null)
+				{
+					cache.Set(cacheItemName, cachedObject, policy);
+				}
 			}
 
 			return cachedObject;
@@ -41,7 +45,11 @@
 				CacheItemPolicy policy = new CacheItemPolicy();
 				policy.AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(cacheTimeInMinutes);
 				cachedObject = objectSettingFunction();
-				cache.Set(cacheItemName, cachedObject, policy);
+
+				if (cachedObject != null)
+				{
+					cache.Set(cacheItemName, cachedObject, policy);
+				}
 			}
 
 			return cachedObject;

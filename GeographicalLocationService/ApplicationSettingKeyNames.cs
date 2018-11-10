@@ -15,5 +15,7 @@
 		public const string RequestLoggingIsEnabled = "RequestLoggingIsEnabled";
 
 		public const string ErrorLoggingIsEnabled = "ErrorLoggingIsEnabled";
+
+		public const string ReturnFullExceptionDetail = "ReturnFullExceptionDetail";		
 	}
 }

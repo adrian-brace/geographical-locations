@@ -5,6 +5,7 @@
 	using System.Web.Configuration;
 	using GeographicalLocationService.Caching;
 	using GeographicalLocationService.HttpClientUtilities;
+	using GeographicalLocationService.Logging;
 
 	public class CountriesService : ICountriesService
 	{
@@ -23,7 +24,7 @@
 		{
 			var cachedCountries = CacheUtilities.GetObjectFromCache($"CountriesCache", _countryCacheTimeMinutes, GetAllCountries);
 
-			if (!cachedCountries.ContainsKey(countryCode))
+			if (cachedCountries == null || !cachedCountries.ContainsKey(countryCode))
 			{
 				return null;
 			}
@@ -33,16 +34,25 @@
 		
 		private Dictionary<string, Country> GetAllCountries()
 		{
-			var response = this._httpClientHelper.GetResponse<List<Country>>(new Uri(this._countriesServiceBaseUri));
-			
-			var allCountries = new Dictionary<string, Country>();
-			
-			foreach (var country in response)
+			try
 			{
-				allCountries.Add(country.Alpha2Code, country);
-			}
+				var response = _httpClientHelper.GetResponse<List<Country>>(new Uri(this._countriesServiceBaseUri));
 
-			return allCountries;
+				var allCountries = new Dictionary<string, Country>();
+
+				foreach (var country in response)
+				{
+					allCountries.Add(country.Alpha2Code, country);
+				}
+
+				return allCountries;
+			}
+			catch (Exception ex)
+			{
+				Logger.RecordMessage("An unexpected error occured retrieving Countries from the external service.");
+				Logger.RecordException(ex);
+				return null;
+			}
 		}
 	}
 }

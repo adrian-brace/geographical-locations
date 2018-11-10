@@ -5,7 +5,7 @@
 	using System.Web.Configuration;
 	using GeographicalLocationService.Caching;
 	using GeographicalLocationService.HttpClientUtilities;
-	using Newtonsoft.Json.Linq;
+	using GeographicalLocationService.Logging;
 
 	public class WeatherService : IWeatherService
 	{
@@ -19,7 +19,7 @@
 
 		public WeatherService(IHttpClientHelper httpClientHelper)
 		{
-			this._httpClientHelper = httpClientHelper;
+			_httpClientHelper = httpClientHelper;
 		}
 
 		public CurrentWeather Get(string cityName, string countryCode)
@@ -28,7 +28,7 @@
 
 			var cachedCurrentWeather = CacheUtilities.GetObjectFromCache($"WeatherCache{criteriaPairing}", _currentWeatherCacheTimeMinutes, GetWeather, criteriaPairing);
 
-			if (!cachedCurrentWeather.ContainsKey(criteriaPairing))
+			if (cachedCurrentWeather == null || !cachedCurrentWeather.ContainsKey(criteriaPairing))
 			{
 				return null;
 			}
@@ -38,11 +38,20 @@
 
 		private Dictionary<string, CurrentWeather> GetWeather(string criteriaPairing)
 		{
-			var uri = new Uri($"{_weatherServiceBaseUri}?q={criteriaPairing}&appid={_openWeatherMapApiKey}");
-			var response = this._httpClientHelper.GetResponse<CurrentWeather>(uri);
-			var currentWeathers = new Dictionary<string, CurrentWeather>();
-			currentWeathers.Add(criteriaPairing, response);
-			return currentWeathers;
-		}
+			try
+			{
+				var uri = new Uri($"{_weatherServiceBaseUri}?q={criteriaPairing}&appid={_openWeatherMapApiKey}");
+				var response = _httpClientHelper.GetResponse<CurrentWeather>(uri);
+				var currentWeathers = new Dictionary<string, CurrentWeather>();
+				currentWeathers.Add(criteriaPairing, response);
+				return currentWeathers;
+			}
+			catch (Exception ex)
+			{
+				Logger.RecordMessage("An unexpected error occured retrieving Current Weather from the external service.");
+				Logger.RecordException(ex);
+				return null;
+			}
+}
 	}
 }

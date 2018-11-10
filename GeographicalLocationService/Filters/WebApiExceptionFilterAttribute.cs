@@ -4,6 +4,7 @@
 	using System.Net;
 	using System.Net.Http;
 	using System.Web.Configuration;
+	using System.Web.Http;
 	using System.Web.Http.Filters;
 	using GeographicalLocationService.Logging;
 
@@ -25,6 +26,25 @@
 			if (actionExecutedContext.Exception is NotImplementedException)
 			{
 				actionExecutedContext.Response = new HttpResponseMessage(HttpStatusCode.NotImplemented);
+			}
+			else if(!(actionExecutedContext.Exception is HttpRequestException)
+				&& !(actionExecutedContext.Exception is HttpResponseException))
+			{
+				var errorContent = "An unexpected exception occured: ";
+
+				if (bool.Parse(WebConfigurationManager.AppSettings[ApplicationSettingKeyNames.ReturnFullExceptionDetail]))
+				{
+					errorContent += actionExecutedContext.Exception.ToString();
+				}
+				else
+				{
+					errorContent += $"{actionExecutedContext.Exception.Message}";
+				}
+
+				actionExecutedContext.Response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+				{
+					Content = new StringContent(errorContent)
+				};
 			}
 		}
 	}
