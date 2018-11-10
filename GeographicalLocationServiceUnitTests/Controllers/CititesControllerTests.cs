@@ -4,6 +4,8 @@
 	using System.Collections.Generic;
 	using System.Data.Entity;
 	using System.Linq;
+	using System.Net;
+	using System.Web.Http;
 	using GeographicalLocationService.App_Start;
 	using GeographicalLocationService.Controllers;
 	using GeographicalLocationService.Database;
@@ -355,6 +357,100 @@
 			Mock.VerifyAll(geographicalLocationsDatabaseMocked);
 			Assert.AreEqual(1, actualResult, "Expected API to report that one City row was successfully updated.");
 			Assert.IsTrue(cities.Any(c => c.Id == updatedCity.Id));			
+		}
+
+		[TestMethod]
+		public void GetCity_NotFound()
+		{
+			var testInputCityIdMatchingNone = 1234;
+			var countriesServiceMocked = new Mock<ICountriesService>();
+			var weatherServiceMocked = new Mock<IWeatherService>();
+
+			var cities = new List<City>();
+
+			var citiesMocked = new Mock<DbSet<City>>();
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Provider).Returns(cities.AsQueryable().Provider);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Expression).Returns(cities.AsQueryable().Expression);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.ElementType).Returns(cities.AsQueryable().ElementType);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.GetEnumerator()).Returns(() => cities.AsQueryable().GetEnumerator());
+
+			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
+			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object).Verifiable();
+
+			CitiesController controller = null;
+
+			// Act
+			try
+			{
+				controller = new CitiesController(
+					geographicalLocationsDatabaseMocked.Object,
+					countriesServiceMocked.Object,
+					weatherServiceMocked.Object);
+
+				HttpResponseException ex = Assert.ThrowsException<HttpResponseException>(() => controller.GetCity(testInputCityIdMatchingNone));
+				Assert.AreEqual("City ID Not Found", ex.Response.ReasonPhrase);
+				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputCityIdMatchingNone.ToString()));
+				Assert.AreEqual(HttpStatusCode.NotFound, ex.Response.StatusCode);
+			}
+			catch (HttpResponseException ex)
+			{
+				Assert.Fail($"Exception not expected: {ex.Message}");
+			}
+			finally
+			{
+				if (controller != null)
+				{
+					controller.Dispose();
+					controller = null;
+				}
+			}
+		}
+
+		[TestMethod]
+		public void GetCities_NotFound()
+		{
+			var testInputCityName = "No Match City";
+			var countriesServiceMocked = new Mock<ICountriesService>();
+			var weatherServiceMocked = new Mock<IWeatherService>();
+
+			var cities = new List<City>();
+
+			var citiesMocked = new Mock<DbSet<City>>();
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Provider).Returns(cities.AsQueryable().Provider);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Expression).Returns(cities.AsQueryable().Expression);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.ElementType).Returns(cities.AsQueryable().ElementType);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.GetEnumerator()).Returns(() => cities.AsQueryable().GetEnumerator());
+
+			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
+			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object).Verifiable();
+
+			CitiesController controller = null;
+
+			// Act
+			try
+			{
+				controller = new CitiesController(
+					geographicalLocationsDatabaseMocked.Object,
+					countriesServiceMocked.Object,
+					weatherServiceMocked.Object);
+
+				HttpResponseException ex = Assert.ThrowsException<HttpResponseException>(() => controller.Search(testInputCityName));
+				Assert.AreEqual("City Name Returned No Matches", ex.Response.ReasonPhrase);
+				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputCityName));
+				Assert.AreEqual(HttpStatusCode.NotFound, ex.Response.StatusCode);
+			}
+			catch (HttpResponseException ex)
+			{
+				Assert.Fail($"Exception not expected: {ex.Message}");
+			}
+			finally
+			{
+				if (controller != null)
+				{
+					controller.Dispose();
+					controller = null;
+				}
+			}
 		}
 	}
 }

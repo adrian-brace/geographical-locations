@@ -119,6 +119,7 @@
     <Compile Include="EmbeddedResourceUtilities.cs" />
     <Compile Include="ExternalServices\Countries\CountriesTests.cs" />
     <Compile Include="ExternalServices\Weather\CurrentWeatherTests.cs" />
+    <Compile Include="Mappers\SearchCityResponseMapperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

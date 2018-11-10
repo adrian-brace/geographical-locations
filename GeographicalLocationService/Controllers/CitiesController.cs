@@ -33,62 +33,6 @@
 		}
 
 		/// <summary>
-		/// Search for Cities by name
-		/// </summary>
-		/// <param name="name">City name</param>
-		/// <returns>List of search city responses</returns>
-		[HttpGet]		
-		public List<MODELS.SearchCityResponse> Search(string name)
-		{
-			var searchCityResponses = new List<MODELS.SearchCityResponse>();
-
-			var matchingCities = _geographicalLocationsDatabase.Cities.Where(c => c.Name == name).ToList();
-
-			if (matchingCities == null || matchingCities.Count == 0)
-			{
-				var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
-				{
-					Content = new StringContent($"No city with Name {name}"),
-					ReasonPhrase = "City Name Not Found"
-				};
-			}
-
-			var distinctCountryCodes = matchingCities.Select(c => c.CountryCode).Distinct().ToList();
-
-			var countriesDictionary = new Dictionary<string, Country>();
-			var weathersDictionary = new Dictionary<string, CurrentWeather>();
-
-			var tasks = new List<Task>();
-
-			distinctCountryCodes.ForEach(countryCode =>
-			{
-				tasks.Add(Task.Factory.StartNew(() =>
-				{
-					countriesDictionary.Add(countryCode, _countriesService.Get(countryCode));
-				}));
-
-				tasks.Add(Task.Factory.StartNew(() =>
-				{
-					weathersDictionary.Add(countryCode, _weatherService.Get(name, countryCode));
-				}));
-			});
-
-			TaskUtilities.WaitForTasks(tasks);
-
-			matchingCities.ForEach(matchedCity =>
-			{
-				var searchCityResponse = SearchCityResponseMapper.Map(
-					matchedCity,
-					countriesDictionary[matchedCity.CountryCode],
-					weathersDictionary[matchedCity.CountryCode]);
-
-				searchCityResponses.Add(searchCityResponse);
-			});
-
-			return searchCityResponses;
-		}
-
-		/// <summary>
 		/// Add a new City
 		/// </summary>
 		/// <param name="addCityRequest">Add city request</param>
@@ -138,11 +82,44 @@
 			return _geographicalLocationsDatabase.SaveChanges();
 		}
 
-		private City GetCity(int id)
+		/// <summary>
+		/// Search for Cities by name
+		/// </summary>
+		/// <param name="name">City name</param>
+		/// <returns>List of search city responses</returns>
+		[HttpGet]
+		public List<MODELS.SearchCityResponse> Search(string name)
 		{
-			var cityToDelete = _geographicalLocationsDatabase.Cities.Where(city => city.Id == id).FirstOrDefault();
+			var matchingCities = GetCities(name);
+			var distinctCountryCodes = matchingCities.Select(c => c.CountryCode).Distinct().ToList();
 
-			if (cityToDelete == null)
+			var countriesDictionary = new Dictionary<string, Country>();
+			var weathersDictionary = new Dictionary<string, CurrentWeather>();
+
+			var tasks = CallExternalServices(name, distinctCountryCodes, countriesDictionary, weathersDictionary);
+
+			TaskUtilities.WaitForTasks(tasks);
+
+			var searchCityResponses = new List<MODELS.SearchCityResponse>();
+
+			matchingCities.ForEach(matchedCity =>
+			{
+				var searchCityResponse = SearchCityResponseMapper.Map(
+					matchedCity,
+					countriesDictionary[matchedCity.CountryCode],
+					weathersDictionary[matchedCity.CountryCode]);
+
+				searchCityResponses.Add(searchCityResponse);
+			});
+
+			return searchCityResponses;
+		}
+
+		internal City GetCity(int id)
+		{
+			var city = _geographicalLocationsDatabase.Cities.Where(c => c.Id == id).FirstOrDefault();
+
+			if (city == null)
 			{
 				var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
 				{
@@ -152,7 +129,48 @@
 				throw new HttpResponseException(resp);
 			}
 
-			return cityToDelete;
+			return city;
+		}
+
+		internal List<City> GetCities(string name)
+		{
+			var matchingCities = _geographicalLocationsDatabase.Cities.Where(c => c.Name == name).ToList();
+
+			if (matchingCities == null || matchingCities.Count == 0)
+			{
+				var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
+				{
+					Content = new StringContent($"There are no cities with the name {name}"),
+					ReasonPhrase = "City Name Returned No Matches"
+				};
+				throw new HttpResponseException(resp);
+			}
+
+			return matchingCities;
+		}
+
+		private List<Task> CallExternalServices(
+			string name,
+			List<string> distinctCountryCodes,
+			Dictionary<string, Country> countriesDictionary,
+			Dictionary<string, CurrentWeather> weathersDictionary)
+		{
+			var tasks = new List<Task>();
+
+			distinctCountryCodes.ForEach(countryCode =>
+			{
+				tasks.Add(Task.Factory.StartNew(() =>
+				{
+					countriesDictionary.Add(countryCode, _countriesService.Get(countryCode));
+				}));
+
+				tasks.Add(Task.Factory.StartNew(() =>
+				{
+					weathersDictionary.Add(countryCode, _weatherService.Get(name, countryCode));
+				}));
+			});
+
+			return tasks;
 		}
 	}
 }
