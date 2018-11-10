@@ -41,6 +41,18 @@
 		public MODELS.AddCityResponse Add([FromBody]MODELS.AddCityRequest addCityRequest)
 		{
 			City cityToAdd = Mapper.Map<MODELS.AddCityRequest, City>(addCityRequest);
+
+			// Validate the country code passed in against all country codes on the external service
+			if (_countriesService.Get(cityToAdd.CountryCode) == null)
+			{
+				var resp = new HttpResponseMessage(HttpStatusCode.BadRequest)
+				{
+					Content = new StringContent($"Country Code {cityToAdd.CountryCode} was not recognised as a valid country code."),
+					ReasonPhrase = "Country Code Invalid"
+				};
+				throw new HttpResponseException(resp);
+			}
+
 			var addedCity = _geographicalLocationsDatabase.Cities.Add(cityToAdd);
 			_geographicalLocationsDatabase.SaveChanges();
 

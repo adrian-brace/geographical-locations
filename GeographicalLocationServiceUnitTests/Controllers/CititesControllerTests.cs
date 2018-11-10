@@ -251,6 +251,22 @@
 			geographicalLocationsDatabaseMocked.Setup(db => db.SaveChanges()).Returns(1).Verifiable();
 
 			var countriesServiceMocked = new Mock<ICountriesService>();
+
+			var testCountry = new Country()
+			{
+				Alpha2Code = newCity.CountryCode,
+				Alpha3Code = "GBR",
+				Currencies = new Currency[]
+				{
+					new Currency()
+					{
+						Code = "GBP"
+					}
+				}
+			};
+
+			countriesServiceMocked.Setup(c => c.Get(newCity.CountryCode)).Returns(testCountry);
+
 			var weatherServiceMocked = new Mock<IWeatherService>();
 
 			MODELS.AddCityResponse actualResult = null;
@@ -284,6 +300,51 @@
 			Assert.AreEqual(newCity.Id, actualResult.Id, "Expected a non zero City ID to be returned");
 			Assert.AreEqual($"~/api/Cities/{newCity.Name}", actualResult.SearchUri, "Expected search Uri to be returned.");
 			Assert.IsTrue(cities.Any(c => c.Id == newCity.Id));
+		}
+
+		[TestMethod]
+		public void Add_InvalidCountryCode()
+		{
+			// Arrange
+			var testInputAddCityRequest = new MODELS.AddCityRequest()
+			{
+				CountryCode = "INVALID",
+				EstablishedOn = new DateTime(1536, 1, 1).ToString("yyyy-MM-dd"),
+				EstimatedPopulation = 250000,
+				Name = "Cardiff",
+				SubRegion = "Glamorgan",
+				TouristRating = 5
+			};
+
+			var countriesServiceMocked = new Mock<ICountriesService>();
+			countriesServiceMocked.Setup(c => c.Get(It.IsAny<string>()));
+
+			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
+			var weatherServiceMocked = new Mock<IWeatherService>();
+
+			CitiesController controller = null;
+
+			// Act
+			try
+			{
+				controller = new CitiesController(
+					geographicalLocationsDatabaseMocked.Object,
+					countriesServiceMocked.Object,
+					weatherServiceMocked.Object);
+
+				HttpResponseException ex = Assert.ThrowsException<HttpResponseException>(() => controller.Add(testInputAddCityRequest));
+				Assert.AreEqual("Country Code Invalid", ex.Response.ReasonPhrase);
+				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputAddCityRequest.CountryCode));
+				Assert.AreEqual(HttpStatusCode.BadRequest, ex.Response.StatusCode);
+			}
+			finally
+			{
+				if (controller != null)
+				{
+					controller.Dispose();
+					controller = null;
+				}
+			}
 		}
 
 		[TestMethod]
@@ -392,10 +453,6 @@
 				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputCityIdMatchingNone.ToString()));
 				Assert.AreEqual(HttpStatusCode.NotFound, ex.Response.StatusCode);
 			}
-			catch (HttpResponseException ex)
-			{
-				Assert.Fail($"Exception not expected: {ex.Message}");
-			}
 			finally
 			{
 				if (controller != null)
@@ -438,10 +495,6 @@
 				Assert.AreEqual("City Name Returned No Matches", ex.Response.ReasonPhrase);
 				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputCityName));
 				Assert.AreEqual(HttpStatusCode.NotFound, ex.Response.StatusCode);
-			}
-			catch (HttpResponseException ex)
-			{
-				Assert.Fail($"Exception not expected: {ex.Message}");
 			}
 			finally
 			{
