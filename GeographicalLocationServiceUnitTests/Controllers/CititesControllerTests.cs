@@ -319,7 +319,17 @@
 			var countriesServiceMocked = new Mock<ICountriesService>();
 			countriesServiceMocked.Setup(c => c.Get(It.IsAny<string>()));
 
+			var existingCities = new List<City>();
+
+			var citiesMocked = new Mock<DbSet<City>>();
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Provider).Returns(existingCities.AsQueryable().Provider);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Expression).Returns(existingCities.AsQueryable().Expression);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.ElementType).Returns(existingCities.AsQueryable().ElementType);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.GetEnumerator()).Returns(() => existingCities.AsQueryable().GetEnumerator());
+
 			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
+			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object).Verifiable();
+
 			var weatherServiceMocked = new Mock<IWeatherService>();
 
 			CitiesController controller = null;
@@ -336,6 +346,77 @@
 				Assert.AreEqual("Country Code Invalid", ex.Response.ReasonPhrase);
 				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputAddCityRequest.CountryCode));
 				Assert.AreEqual(HttpStatusCode.BadRequest, ex.Response.StatusCode);
+			}
+			finally
+			{
+				if (controller != null)
+				{
+					controller.Dispose();
+					controller = null;
+				}
+			}
+		}
+
+		[TestMethod]
+		public void Add_CityAlreadyExists()
+		{
+			// Arrange
+			var testInputAddCityRequest = new MODELS.AddCityRequest()
+			{
+				CountryCode = "GB",
+				EstablishedOn = new DateTime(1536, 1, 1).ToString("yyyy-MM-dd"),
+				EstimatedPopulation = 250000,
+				Name = "Cardiff",
+				SubRegion = "Glamorgan",
+				TouristRating = 5
+			};
+
+			var existingCity = new City()
+			{
+				Id = 1234,
+				CountryCode = testInputAddCityRequest.CountryCode,
+				EstablishedOn = new DateTime(1536, 1, 1),
+				EstimatedPopulation = 250000,
+				Name = testInputAddCityRequest.Name,
+				SubRegion = testInputAddCityRequest.SubRegion,
+				TouristRating = 5
+			};
+
+			var cities = new List<City>()
+			{
+				existingCity
+			};
+
+			var citiesMocked = new Mock<DbSet<City>>();
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Provider).Returns(cities.AsQueryable().Provider);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.Expression).Returns(cities.AsQueryable().Expression);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.ElementType).Returns(cities.AsQueryable().ElementType);
+			citiesMocked.As<IQueryable<City>>().Setup(m => m.GetEnumerator()).Returns(() => cities.AsQueryable().GetEnumerator());
+
+			var geographicalLocationsDatabaseMocked = new Mock<IGeographicalLocationsDatabase>();
+			geographicalLocationsDatabaseMocked.Setup(db => db.Cities).Returns(citiesMocked.Object).Verifiable();
+
+			var countriesServiceMocked = new Mock<ICountriesService>();
+			countriesServiceMocked.Setup(c => c.Get(It.IsAny<string>()));
+
+			var weatherServiceMocked = new Mock<IWeatherService>();
+
+			CitiesController controller = null;
+
+			// Act
+			try
+			{
+				controller = new CitiesController(
+					geographicalLocationsDatabaseMocked.Object,
+					countriesServiceMocked.Object,
+					weatherServiceMocked.Object);
+
+				HttpResponseException ex = Assert.ThrowsException<HttpResponseException>(() => controller.Add(testInputAddCityRequest));
+				Assert.AreEqual("City Already Exists", ex.Response.ReasonPhrase);
+				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputAddCityRequest.Name));
+				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputAddCityRequest.CountryCode));
+				Assert.IsTrue(ex.Response.Content.ReadAsStringAsync().Result.Contains(testInputAddCityRequest.SubRegion));
+				Assert.AreEqual(HttpStatusCode.InternalServerError, ex.Response.StatusCode);
 			}
 			finally
 			{

@@ -43,6 +43,19 @@
 		{
 			City cityToAdd = Mapper.Map<MODELS.AddCityRequest, City>(addCityRequest);
 
+			if (_geographicalLocationsDatabase.Cities.Any(
+				c => c.Name == cityToAdd.Name
+				&& c.CountryCode == cityToAdd.CountryCode 
+				&& c.SubRegion == cityToAdd.SubRegion))
+			{
+				var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+				{
+					Content = new StringContent($"A city with name {cityToAdd.Name}, country {cityToAdd.CountryCode} and sub region {cityToAdd.SubRegion} already exists."),
+					ReasonPhrase = "City Already Exists"
+				};
+				throw new HttpResponseException(resp);
+			}
+
 			// Validate the country code passed in against all country codes on the external service
 			if (_countriesService.Get(cityToAdd.CountryCode) == null)
 			{
